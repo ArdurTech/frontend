@@ -1,29 +1,27 @@
-# Use an official Node.js runtime as a parent image
-FROM node:14 AS build
+# Use an official Node runtime as a parent image
+FROM node:16 AS build
 
-# Set the working directory to /app
-WORKDIR /app
+# Set the working directory
+WORKDIR /frontend
 
-# Copy package.json and package-lock.json into the working directory
+# Copy the package.json and install dependencies
 COPY package*.json ./
-
-# Install any needed packages
 RUN npm install
 
-# Copy the current directory contents into the container at /app
+# Copy the rest of the application code
 COPY . .
 
-# Build the app for production using Vite
+# Build the React application
 RUN npm run build
 
-# Use nginx to serve the build
+# Use a lightweight web server to serve the build
 FROM nginx:alpine
 
-# Copy the build output to the nginx html folder
-COPY --from=build /app/dist /usr/share/nginx/html
+# Copy the build output from the previous stage
+COPY --from=build /frontend /usr/share/nginx/html
 
-# Expose port 80
+# Expose port 80 for the web server
 EXPOSE 80
 
-# Run nginx
+# Start nginx server
 CMD ["nginx", "-g", "daemon off;"]
