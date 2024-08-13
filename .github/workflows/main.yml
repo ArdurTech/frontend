@@ -40,16 +40,46 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1  # specify your region
+          aws-region: us-east-1  # specify your region
 
       - name: Install AWS CLI
         run: |
           sudo apt-get update
           sudo apt-get install -y awscli
 
-      - name: Deploy to Elastic Beanstalk
-        env:
-          AWS_REGION: ap-south-1  # specify your region
+      - name: Create Elastic Beanstalk Dockerrun.aws.json
         run: |
-          # Update environment with new Docker image
-          aws elasticbeanstalk update-environment --application-name ocr_webapp --environment-name Ocrwebapp-env --version-label frontend-latest-${{ github.sha }}
+          echo '{
+            "AWSEBDockerrunVersion": 1,
+            "Image": {
+              "Name": "${{ secrets.DOCKER_USERNAME }}/frontend:latest",
+              "Update": "true"
+            },
+            "Ports": [
+              {
+                "ContainerPort": "80"
+              }
+            ]
+          }' > Dockerrun.aws.json
+
+      - name: Create application version bundle
+        run: |
+          zip -r frontend-${{ github.sha }}.zip Dockerrun.aws.json
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp frontend-${{ github.sha }}.zip s3://elasticbeanstalk-ap-south-1-024848475699/
+
+      - name: Create application version in Elastic Beanstalk
+        run: |
+          aws elasticbeanstalk create-application-version \
+            --application-name ocr_webapp \
+            --version-label frontend-${{ github.sha }} \
+            --source-bundle S3Bucket="elasticbeanstalk-ap-south-1-024848475699",S3Key="frontend-${{ github.sha }}.zip"
+
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          aws elasticbeanstalk update-environment \
+            --application-name ocr_webapp \
+            --environment-name Ocrwebapp-env  \
+            --version-label frontend-${{ github.sha }}
