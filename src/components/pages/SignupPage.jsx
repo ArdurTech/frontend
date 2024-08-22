@@ -1,67 +1,60 @@
-//importing necessarry libraries for signup function
-import { useState, useEffect } from "react"; //use state for state variables
-import axios from "axios"; //axios for communication with backend
-import { toast } from "sonner"; //sonner for toast notification
-import styles from "../styles/Signup.module.css"; //module css import
-import { Link, useHistory } from "react-router-dom"; //funcions from library
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "sonner";
+import styles from "../styles/Signup.module.css";
+import { Link, useHistory } from "react-router-dom";
 
-//creation of the sign up component function
 function SignupPage() {
-  //state variables declaration using useState
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const history = useHistory(); //for dinamically changing the path
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const history = useHistory();
 
   useEffect(() => {
-    document.title = "Login System - SignUp Page"; //dinamically changes the tittle
-  });
+    document.title = "Login System - SignUp Page";
+  }, []);
 
-  //axios post function which will first check for valid input, send a post request and then use sonner to render a toast notification
   const handleSignup = async (e) => {
-    e.preventDefault(); //disables the reload on submission
+    e.preventDefault(); // Disables the reload on submission
+
     try {
-      //check if user has filled all required fields
-      if (
-        !username ||
-        username === "" ||
-        !email ||
-        email === "" ||
-        !password ||
-        password === ""
-      ) {
-        //incase all fields are not filled warn the user
+      if (!username || !email || !password || !confirmPassword) {
         toast.warning("All Fields are Required");
-        return; //return if the the case matches
+        return;
       }
 
-      //if user has filled all necessary fields send axios post request
+      if (password !== confirmPassword) {
+        toast.warning("Passwords do not match");
+        return;
+      }
+
       const res = await axios.post("http://localhost:3000/auth/signup", {
-        username: username,
-        email: email,
-        password: password
+        username,
+        email,
+        password,
       });
 
-      //on successful account creation
       if (res.status === 201) {
-        setUsername(""); //empty the field after successful signup
-        setEmail(""); //empty the field after successful signup
-        setPassword(""); //empty the field after successful signup
-        //notify the client that the user has been created
-        toast.success("User Created Sucessfully, Redirecting...");
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        toast.success("Registration successful! Redirecting...");
+        setTimeout(() => {
+          history.push("/login-page");
+        }, 3000);
+      } else {
+        // Handle unexpected response statuses
+        toast.error("Unexpected response from the server");
       }
-
-      setTimeout(() => {
-        history.push("/login");
-      }, 3000);
     } catch (error) {
-      //incase of error
       console.error("Error Creating User: ", error);
-      toast.error("Error Creating User");
+      // Determine the error message
+      const errorMessage = error.response?.data?.message || error.message;
+      toast.error(`Error Creating User: ${errorMessage}`);
     }
   };
-
-  //bootstrap components
   return (
     <>
       <div className={"card"} id={styles.card}>
@@ -69,50 +62,54 @@ function SignupPage() {
           <h2 id={styles.h2}>SignUp</h2>
           <hr />
           <form onSubmit={handleSignup}>
-            {/* for Username */}
             <div>
-              <label>Username : </label>
+              <label>Username: </label>
               <input
                 type="text"
                 name="username"
-                placeholder={"Enter Username"}
+                placeholder="Enter Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
 
-            {/* for Email */}
             <div>
-              <label>Email : </label>
+              <label>Email: </label>
               <input
                 type="email"
                 name="email"
-                placeholder={"Enter Email"}
+                placeholder="Enter Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
-            {/* for Password */}
             <div>
-              <label>Password : </label>
+              <label>Password: </label>
               <input
                 type="password"
                 name="password"
-                placeholder={"Enter Password"}
+                placeholder="Enter Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
-            {/* submit and switch to login buttons */}
+            <div>
+              <label>Confirm Password: </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
 
-            {/* login */}
-            <a>
-              <Link to="/login">Have an account? LogIn</Link>
-            </a>
+            <div>
+              <Link to="/login-page">Have an account? Log In</Link>
+            </div>
 
-            {/* signup */}
             <button className={"btn btn-success"} type="submit">
               SignUp
             </button>
@@ -123,5 +120,4 @@ function SignupPage() {
   );
 }
 
-//exporting the created signup function to be used as a route in the app.jsx file
 export default SignupPage;

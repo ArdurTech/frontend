@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "../styles/Special.module.css";
-import { useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom"; // Import useHistory
 import { toast } from "sonner";
+import Slider from "react-slick"; // Import react-slick
 
 function SpecialPage() {
   const history = useHistory();
   const toastWarningMessage = useRef(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hrMenuOpen, setHrMenuOpen] = useState(false); // State to manage HR submenu visibility
 
   useEffect(() => {
     document.title = "Login System - Special Page";
@@ -26,22 +28,75 @@ function SpecialPage() {
     setMenuOpen(!menuOpen);
   };
 
+  const toggleHrMenu = () => {
+    setHrMenuOpen(!hrMenuOpen); // Toggle HR submenu visibility
+  };
+
+  // Function to handle DataEntry navigation
+  const handleTitleIndexClick = () => {
+    history.push("/titleindex");
+  };
+  const handleHomeClick = () => {
+    history.push("/home");
+  };
+  const handleTimeSheetClick = () => {
+    history.push("/timesheet");
+  };
+  const handleLeaveRequestClick = () => {
+    history.push("/leaverequest");
+  };
+  const handleDailyAttendanceClick = () => {
+    history.push("/dailyattendance");
+  };
+  const handlePaySlipClick = () => {
+    history.push("/payslip");
+  };
+  const handleITSupportClick = () => {
+    history.push("/ITSupport");
+  };
+  const handleBulletClick = () => {
+    history.push("/Bullet");
+  };
+  const handleLogOutClick = () => {
+    history.push("/LogOut");
+  };
+  // Slick carousel settings
+  const carouselSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+  };
+
   return (
     <>
       <header className={styles.header}>
         <div className={styles.menuIcon} onClick={toggleMenu}>
           ☰
         </div>
-        <h1 className={styles.welcomeMessage}>Welcome to the Special Page</h1>
+        <h1 className={styles.welcomeMessage}>WELCOME TO ARDUR TECHNOLOGY</h1>
         {menuOpen && (
           <div className={styles.verticalMenu}>
             <ul>
-              <li>Home</li>
-              <li>About</li>
-              <li>Contact</li>
-              <li>HOME</li>
-              <li>About</li>
-              <li>Contact</li>
+            <li onClick={handleHomeClick}>Home</li>
+            <li onClick={handleTimeSheetClick}>Time Sheet</li>
+              <li onClick={toggleHrMenu} className={styles.hrMenu}>
+                HR
+                {hrMenuOpen && (
+                  <ul className={styles.subMenu}>
+                   <li onClick={handleLeaveRequestClick}>Leave Request</li>
+                   <li onClick={handleDailyAttendanceClick}>Daily Attendance</li>
+                   <li onClick={handlePaySlipClick}>Pay Slip</li>
+                  </ul>
+                )}
+              </li>
+              <li onClick={handleITSupportClick}>IT Support</li>
+              <li onClick={handleBulletClick}>Bullet</li>
+              <li onClick={handleTitleIndexClick}>Title Index</li>
+              <li onClick={handleLogOutClick}>LogOut</li>
             </ul>
           </div>
         )}
@@ -49,17 +104,49 @@ function SpecialPage() {
 
       <div className={styles.container}>
         <div id={styles.companyInfo}>
-          <h2>About Our Company</h2>
+          <h2> Employee Dashboard</h2>
           <p className="p">
-          Ardur Technology is a Multi-Faceted organization offering diverse global business 
-          services like Title Insurance, Appraisal Services, Medical Insurance, Accounting and 
-          Financial Reporting, IT Software and Services, Digital Transformation. Our TEAM of Professionals 
-          has the DNA and ZEAL incorporated towards a passion for client satisfaction, technological
-           innovation, deep-rooted industry and business process knowledge. Our extensive portfolio
-            of services and solutions span across multiple industries, such as real estate, finance,
-             healthcare, manufacturing, logistics, travel, retail, hospitality,
-           technology, telecom and a lot more that enables your business in planning ahead.
+            Ardur Technology is a Multi-Faceted organization offering diverse
+            global business services like Title Insurance, Appraisal Services,
+            Medical Insurance, Accounting and Financial Reporting, IT Software
+            and Services, Digital Transformation. Our TEAM of Professionals has
+            the DNA and ZEAL incorporated towards a passion for client
+            satisfaction, technological innovation, deep-rooted industry and
+            business process knowledge. Our extensive portfolio of services and
+            solutions span across multiple industries, such as real estate,
+            finance, healthcare, manufacturing, logistics, travel, retail,
+            hospitality, technology, telecom and a lot more that enables your
+            business in planning ahead.
           </p>
+          {/* Carousel component */}
+          <div className={styles.carousel}>
+            <Slider {...carouselSettings}>
+              <div>
+                <img
+                  src="https://www.smartsys.be/wp-content/uploads/2020/02/Image-block.jpg"
+                  alt="Slide 1"
+                />
+              </div>
+              <div>
+                <img
+                  src="https://ggasolutions.com/wp-content/uploads/2024/01/Benefits-of-Using-Nearshore-Resources-for-Back-Office-Tasks_.jpg"
+                  alt="Slide 2"
+                />
+              </div>
+              <div>
+                <img
+                  src="https://st3.depositphotos.com/1441511/17615/i/1600/depositphotos_176153934-stock-photo-young-business-man-working-on.jpg"
+                  alt="Slide 3"
+                />
+              </div>
+              <div>
+                <img
+                  src="https://www.lbcc.edu/sites/main/files/imagecache/lightbox/main-images/cos_adult_ed.jpg"
+                  alt="Slide 4"
+                />
+              </div>
+            </Slider>
+          </div>
         </div>
       </div>
 
