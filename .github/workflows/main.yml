@@ -77,9 +77,4 @@ jobs:
             --version-label frontend-${{ github.sha }} \
             --source-bundle S3Bucket="elasticbeanstalk-ap-south-1-024848475699",S3Key="frontend-${{ github.sha }}.zip"
 
-      - name: Deploy to Elastic Beanstalk
-        run: |
-          aws elasticbeanstalk update-environment \
-            --application-name ocr_webapp \
-            --environment-name Ocrwebapp-env  \
-            --version-label frontend-${{ github.sha }}
+     
