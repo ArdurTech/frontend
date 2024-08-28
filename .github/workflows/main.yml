@@ -65,25 +65,25 @@ jobs:
 
       - name: Create application version bundle
         run: |
-          zip -r frontend-${{ github.sha }}.zip Dockerrun.aws.json
+          zip -r testfrontend-${{ github.sha }}.zip Dockerrun.aws.json
 
       - name: Upload to S3
         run: |
-          aws s3 cp frontend-${{ github.sha }}.zip s3://elasticbeanstalk-ap-south-1-024848475699/
+          aws s3 cp testfrontend-${{ github.sha }}.zip s3://elasticbeanstalk-ap-south-1-024848475699/
 
       - name: Create application version in Elastic Beanstalk
         run: |
           aws elasticbeanstalk create-application-version \
-            --application-name ocr_webapp \
-            --version-label frontend-${{ github.sha }} \
+            --application-name testfrontend-application \
+            --version-label testfrontend-${{ github.sha }} \
             --source-bundle S3Bucket="elasticbeanstalk-ap-south-1-024848475699",S3Key="frontend-${{ github.sha }}.zip"
 
       - name: Deploy to Elastic Beanstalk
         run: |
           aws elasticbeanstalk update-environment \
-            --application-name ocr_webapp \
-            --environment-name Ocrwebapp-env  \
-            --version-label frontend-${{ github.sha }}
+            --application-name testfrontend-application \
+            --environment-name Testfrontend-application-env  \
+            --version-label testfrontend-${{ github.sha }}
 =======
      
 >>>>>>> 2c67bc538ca11342c9456e553819ffb834bde546
