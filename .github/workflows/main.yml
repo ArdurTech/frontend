@@ -43,7 +43,7 @@ jobs:
       run: |
         aws elasticbeanstalk create-application-version \
           --application-name testfrontend-application \
-          --version-label v1.0.0 \
+          --version-label v2.0.0 \
           --source-bundle S3Bucket="elasticbeanstalk-ap-south-1-024848475699",S3Key="testfrontend-28605066fe6ac0dc2476e324267e0c23be01a682.zip"
         aws elasticbeanstalk update-environment \
           --environment-name Testfrontend-application-env \
