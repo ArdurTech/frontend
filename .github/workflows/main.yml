@@ -76,7 +76,7 @@ jobs:
           aws elasticbeanstalk create-application-version \
             --application-name testfrontend-application \
             --version-label testfrontend-${{ github.sha }} \
-            --source-bundle S3Bucket="elasticbeanstalk-ap-south-1-024848475699",S3Key="frontend-${{ github.sha }}.zip"
+            --source-bundle S3Bucket="elasticbeanstalk-ap-south-1-024848475699",S3Key="testfrontend-${{ github.sha }}.zip"
 
       - name: Deploy to Elastic Beanstalk
         run: |
