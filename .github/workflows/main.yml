@@ -32,8 +32,8 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/testfrontend:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/testfrontend:latest
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -52,7 +52,7 @@ jobs:
           echo '{
             "AWSEBDockerrunVersion": 1,
             "Image": {
-              "Name": "${{ secrets.DOCKER_USERNAME }}/frontend:latest",
+              "Name": "${{ secrets.DOCKER_USERNAME }}/testfrontend:latest",
               "Update": "true"
             },
             "Ports": [
