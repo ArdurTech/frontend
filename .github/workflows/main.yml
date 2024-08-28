@@ -3,87 +3,51 @@ name: Deploy to AWS Elastic Beanstalk
 on:
   push:
     branches:
-      - main  # or your default branch
+      - main  # Trigger deployment on push to the main branch
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '14'
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-      - name: Install dependencies
-        run: npm install
+    - name: Cache Docker layers
+      uses: actions/cache@v4
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
 
-      - name: Build the application with Vite
-        run: npm run build
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Log in to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build and push Docker image
+      run: |
+        docker build --tag ${{ secrets.DOCKER_USERNAME }}/testfrontend:latest .
+        docker push ${{ secrets.DOCKER_USERNAME }}/testfrontend:latest
 
-      - name: Build and push Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/testfrontend:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/testfrontend:latest
+    - name: Deploy to Elastic Beanstalk
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ap-south-1  # Change this to your AWS region
+      run: |
+        aws elasticbeanstalk create-application-version \
+          --application-name testfrontend-application \
+          --version-label v1.0.0 \
+          --source-bundle S3Bucket="elasticbeanstalk-ap-south-1-024848475699t",S3Key="testfrontend.zip"
+        aws elasticbeanstalk update-environment \
+          --environment-name Testfrontend-application-env \
+          --version-label v1.0.0
 
-<<<<<<< HEAD
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1  # specify your region
-
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-
-      - name: Create Elastic Beanstalk Dockerrun.aws.json
-        run: |
-          echo '{
-            "AWSEBDockerrunVersion": 1,
-            "Image": {
-              "Name": "${{ secrets.DOCKER_USERNAME }}/testfrontend:latest",
-              "Update": "true"
-            },
-            "Ports": [
-              {
-                "ContainerPort": "80"
-              }
-            ]
-          }' > Dockerrun.aws.json
-
-      - name: Create application version bundle
-        run: |
-          zip -r testfrontend-${{ github.sha }}.zip Dockerrun.aws.json
-
-      - name: Upload to S3
-        run: |
-          aws s3 cp testfrontend-${{ github.sha }}.zip s3://elasticbeanstalk-ap-south-1-024848475699/
-
-      - name: Create application version in Elastic Beanstalk
-        run: |
-          aws elasticbeanstalk create-application-version \
-            --application-name testfrontend-application \
-            --version-label testfrontend-${{ github.sha }} \
-            --source-bundle S3Bucket="elasticbeanstalk-ap-south-1-024848475699",S3Key="frontend-${{ github.sha }}.zip"
-
-      - name: Deploy to Elastic Beanstalk
-        run: |
-          aws elasticbeanstalk update-environment \
-            --application-name testfrontend-application \
-            --environment-name Testfrontend-application-env  \
-            --version-label testfrontend-${{ github.sha }}
-=======
-     
->>>>>>> 2c67bc538ca11342c9456e553819ffb834bde546
+    - name: Notify deployment
+      run: echo "Deployment to AWS Elastic Beanstalk completed successfully."
