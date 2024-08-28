@@ -51,7 +51,7 @@ jobs:
       - name: Create Elastic Beanstalk Dockerrun.aws.json
         run: |
           echo '{
-            "AWSEBDockerrunVersion": 1,
+            "AWSEBDockerrunVersion": 3,
             "Image": {
               "Name": "${{ secrets.DOCKER_USERNAME }}/testfrontend:latest",
               "Update": "true"
