@@ -35,7 +35,7 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/testfrontend:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/testfrontend:latest
 
-<<<<<<< HEAD
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -84,6 +84,4 @@ jobs:
             --application-name testfrontend-application \
             --environment-name Testfrontend-application-env  \
             --version-label testfrontend-${{ github.sha }}
-=======
-     
->>>>>>> 2c67bc538ca11342c9456e553819ffb834bde546
+
